@@ -8,9 +8,20 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    // Preprocesa estos paquetes de FullCalendar para evitar errores de ESM
+    include: [
+      '@fullcalendar/core',
+      '@fullcalendar/react',
+      '@fullcalendar/daygrid',
+      '@fullcalendar/timegrid',
+      '@fullcalendar/interaction'
+    ]
+  },
   build: {
     rollupOptions: {
-      external: ["@fullcalendar/core"]
+      // Generalmente no necesitamos externalizar @fullcalendar/core si usamos optimizeDeps
+      external: []
     }
   }
 })
