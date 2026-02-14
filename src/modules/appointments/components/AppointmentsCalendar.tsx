@@ -3,7 +3,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import esLocale from '@fullcalendar/core/locales/es';
 import type { Appointment, AppointmentStatus } from '../types/Appointments.types';
 
 interface AppointmentsCalendarProps {
@@ -91,7 +90,6 @@ export const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 }}
                 events={events}
-                locale={esLocale}
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
                 height="auto"
