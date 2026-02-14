@@ -3,7 +3,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import esLocale from '@fullcalendar/core/locales/es.js';
+import esLocale from '@fullcalendar/core/locales/es';
 import type { Appointment, AppointmentStatus } from '../types/Appointments.types';
 
 interface AppointmentsCalendarProps {
