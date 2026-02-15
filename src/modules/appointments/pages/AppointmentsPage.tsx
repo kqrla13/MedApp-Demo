@@ -12,10 +12,12 @@ import type { Appointment, AppointmentDto } from "../types/Appointments.types";
 import type { CatalogItem } from "../../../core/types/Catalog";
 import { cn } from "../../../core/utils/cn";
 import { useNavigate } from "react-router-dom";
+import { useRole } from "../../../core/hooks/useRole";
 
 export const AppointmentsPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { isDoctor } = useRole();
 
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [doctors, setDoctors] = useState<CatalogItem[]>([]);
@@ -210,49 +212,51 @@ export const AppointmentsPage = () => {
                     </div>
                 </Modal>
 
-                <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                    <div className="flex items-center gap-2 w-full md:w-72">
-                        <Filter size={18} className="text-slate-400 shrink-0" />
-                        <Select
-                            name="doctorFilter"
-                            value={doctorFilter}
-                            onChange={(e) => setDoctorFilter(e.target.value)}
-                            options={[
-                                { value: '', label: 'Todos los doctores' },
-                                ...doctors.map(d => ({ value: String(d.id), label: `Dr. ${d.name} ${d.lastName || ''}` }))
-                            ]}
-                            containerClassName="!mb-0"
-                            size="sm"
-                        />
-                    </div>
+                {!isDoctor && (
+                    <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                        <div className="flex items-center gap-2 w-full md:w-72">
+                            <Filter size={18} className="text-slate-400 shrink-0" />
+                            <Select
+                                name="doctorFilter"
+                                value={doctorFilter}
+                                onChange={(e) => setDoctorFilter(e.target.value)}
+                                options={[
+                                    { value: '', label: 'Todos los doctores' },
+                                    ...doctors.map(d => ({ value: String(d.id), label: `Dr. ${d.name} ${d.lastName || ''}` }))
+                                ]}
+                                containerClassName="!mb-0"
+                                size="sm"
+                            />
+                        </div>
 
-                    <div className="flex bg-slate-100 p-1 rounded-xl self-end md:self-auto">
-                        <button
-                            onClick={() => setViewMode('table')}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
-                                viewMode === 'table'
-                                    ? "bg-white text-blue-600 shadow-sm scale-[1.02]"
-                                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
-                            )}
-                        >
-                            <LayoutGrid size={18} />
-                            Listado
-                        </button>
-                        <button
-                            onClick={() => setViewMode('calendar')}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
-                                viewMode === 'calendar'
-                                    ? "bg-white text-blue-600 shadow-sm scale-[1.02]"
-                                    : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
-                            )}
-                        >
-                            <CalendarIcon size={18} />
-                            Calendario
-                        </button>
+                        <div className="flex bg-slate-100 p-1 rounded-xl self-end md:self-auto">
+                            <button
+                                onClick={() => setViewMode('table')}
+                                className={cn(
+                                    "flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
+                                    viewMode === 'table'
+                                        ? "bg-white text-blue-600 shadow-sm scale-[1.02]"
+                                        : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+                                )}
+                            >
+                                <LayoutGrid size={18} />
+                                Listado
+                            </button>
+                            <button
+                                onClick={() => setViewMode('calendar')}
+                                className={cn(
+                                    "flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
+                                    viewMode === 'calendar'
+                                        ? "bg-white text-blue-600 shadow-sm scale-[1.02]"
+                                        : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+                                )}
+                            >
+                                <CalendarIcon size={18} />
+                                Calendario
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {viewMode === 'table' ? (
                     <AppointmentsTable

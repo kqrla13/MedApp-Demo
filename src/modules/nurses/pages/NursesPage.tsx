@@ -7,9 +7,11 @@ import type { Nurse, NurseDto } from "../types/NurseTypes";
 import { NursesTable } from "../components/NursesTable";
 import { NursesFormComponent } from "../components/NursesFormComponent";
 import { getAllNurses, createNurse, updateNurse, deleteNurse } from "../services/NurseService";
+import { useRole } from "../../../core/hooks/useRole";
 
 export const NursesPage = () => {
     const dispatch = useDispatch();
+    const { isAdmin } = useRole();
 
     const [nurses, setNurses] = useState<Nurse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -144,9 +146,9 @@ export const NursesPage = () => {
                 <PageHeader
                     title="Enfermeros"
                     description="Administra el personal de enfermería y su contacto."
-                    buttonLabel="Registrar Enfermero"
-                    onButtonClick={handleOpenModal}
-                    buttonIcon={<Plus size={20} />}
+                    buttonLabel={isAdmin ? "Registrar Enfermero" : undefined}
+                    onButtonClick={isAdmin ? handleOpenModal : undefined}
+                    buttonIcon={isAdmin ? <Plus size={20} /> : undefined}
                 />
 
                 <Modal

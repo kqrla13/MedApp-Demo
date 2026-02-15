@@ -11,6 +11,7 @@ import { PatientsForm } from "../components/PatientsForm";
 import { EmergencyContactForm } from "../components/EmergencyContactForm";
 import { getEmergencyContactByPatientId, UpdateEmergencyContact, CreateEmergencyContact } from "../services/EmergencyContactService";
 import { getAppointmentsByPatientId } from "../../appointments/services/AppointmentsService";
+import { useRole } from "../../../core/hooks/useRole";
 
 // Modular Components
 import { PatientProfileCard } from "../components/PatientProfileCard";
@@ -23,6 +24,7 @@ export const PatientDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { isAdmin, isNurse } = useRole();
 
     const [patient, setPatient] = useState<Patient | null>(null);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -161,11 +163,13 @@ export const PatientDetailsPage = () => {
                     </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <Button variant="outline" size="sm" onClick={() => setIsEditPatientModalOpen(true)}>
-                        Editar Información
-                    </Button>
-                </div>
+                {(isAdmin || isNurse) && (
+                    <div className="flex gap-3">
+                        <Button variant="outline" size="sm" onClick={() => setIsEditPatientModalOpen(true)}>
+                            Editar Información
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

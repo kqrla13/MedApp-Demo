@@ -2,6 +2,7 @@ import { Button, Table, type Column } from "../../../shared/components"
 import { User, Phone, Mail, Award, Trash2, Eye, Edit2 } from 'lucide-react'
 import type { Nurse } from "../types/NurseTypes";
 import { useNavigate } from "react-router-dom";
+import { useRole } from "../../../core/hooks/useRole";
 
 interface NursesTableProps {
     data: Nurse[];
@@ -13,6 +14,7 @@ interface NursesTableProps {
 export const NursesTable = ({ data, isLoading, onDelete, onEdit }: NursesTableProps) => {
 
     const navigate = useNavigate();
+    const { isAdmin } = useRole();
 
     const columns: Column<Nurse>[] = [
         {
@@ -78,26 +80,30 @@ export const NursesTable = ({ data, isLoading, onDelete, onEdit }: NursesTablePr
                     >
                         <Eye size={18} />
                     </Button>
-                    <Button
-                        variant="ghost"
-                        size="xs"
-                        rounded="lg"
-                        className="text-amber-500 hover:bg-amber-50"
-                        onClick={() => onEdit?.(row)}
-                        title="Editar"
-                    >
-                        <Edit2 size={18} />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="xs"
-                        rounded="lg"
-                        className="text-red-500 hover:bg-red-50"
-                        onClick={() => onDelete?.(row)}
-                        title="Eliminar"
-                    >
-                        <Trash2 size={18} />
-                    </Button>
+                    {isAdmin && (
+                        <>
+                            <Button
+                                variant="ghost"
+                                size="xs"
+                                rounded="lg"
+                                className="text-amber-500 hover:bg-amber-50"
+                                onClick={() => onEdit?.(row)}
+                                title="Editar"
+                            >
+                                <Edit2 size={18} />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="xs"
+                                rounded="lg"
+                                className="text-red-500 hover:bg-red-50"
+                                onClick={() => onDelete?.(row)}
+                                title="Eliminar"
+                            >
+                                <Trash2 size={18} />
+                            </Button>
+                        </>
+                    )}
                 </div>
             )
         }

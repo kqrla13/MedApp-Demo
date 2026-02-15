@@ -7,9 +7,11 @@ import { getAllDoctors, createDoctor, deleteDoctor } from "../services/DoctorsSe
 import type { Doctor, DoctorDto } from "../types/DoctorsTypes";
 import { DoctorsTable } from "../components/DoctorsTable";
 import { DoctorsForm } from "../components/DoctorsForm";
+import { useRole } from "../../../core/hooks/useRole";
 
 export const DoctorsPage = () => {
     const dispatch = useDispatch();
+    const { isAdmin } = useRole();
 
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -126,9 +128,9 @@ export const DoctorsPage = () => {
                 <PageHeader
                     title="Doctores"
                     description="Administra el personal médico y sus especialidades."
-                    buttonLabel="Registrar Doctor"
-                    onButtonClick={handleOpenModal}
-                    buttonIcon={<Plus size={20} />}
+                    buttonLabel={isAdmin ? "Registrar Doctor" : undefined}
+                    onButtonClick={isAdmin ? handleOpenModal : undefined}
+                    buttonIcon={isAdmin ? <Plus size={20} /> : undefined}
                 />
 
                 <Modal

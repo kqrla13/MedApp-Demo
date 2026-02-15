@@ -17,6 +17,7 @@ import type { MedicalConsultation } from "../../medicalRecord/types/MedicalConsu
 import { createVitalSigns, getVitalSignsByAppointmentId, updateVitalSigns } from "../../medicalRecord/services/VitalSignsService";
 import { getMedicalHistoryByPatientId, createMedicalHistory, updateMedicalHistory } from "../../medicalRecord/services/MedicalHistoryService";
 import { getConsultationByAppointmentId } from "../../medicalRecord/services/MedicalConsultationService";
+import { useRole } from "../../../core/hooks/useRole";
 
 // Modular Components
 import { AppointmentProfileCard } from "../components/AppointmentProfileCard";
@@ -27,6 +28,7 @@ export const AppointmentDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { isAdmin, isNurse, isDoctor } = useRole();
 
     const [appointment, setAppointment] = useState<Appointment | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -306,30 +308,34 @@ export const AppointmentDetailsPage = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                    {appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+                    {(isAdmin || isNurse || isDoctor) && (
                         <>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleOpenVitalSigns}
-                                leftIcon={<Activity size={16} />}
-                                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                            >
-                                {vitalSigns ? "Editar Signos" : "Signos Vitales"}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleOpenMedicalHistory}
-                                leftIcon={<ClipboardList size={16} />}
-                                className="text-purple-600 border-purple-200 hover:bg-purple-50"
-                            >
-                                {medicalHistory ? "Ver Historial" : "Historial Médico"}
-                            </Button>
+                            {(isAdmin || isNurse) && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleOpenVitalSigns}
+                                    leftIcon={<Activity size={16} />}
+                                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                >
+                                    {vitalSigns ? "Editar Signos" : "Signos Vitales"}
+                                </Button>
+                            )}
+                            {(isAdmin || isDoctor) && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleOpenMedicalHistory}
+                                    leftIcon={<ClipboardList size={16} />}
+                                    className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                                >
+                                    {medicalHistory ? "Ver Historial" : "Historial Médico"}
+                                </Button>
+                            )}
                         </>
                     )}
 
-                    {appointment.status === 'PENDING' && (
+                    {appointment.status === 'PENDING' && (isAdmin || isDoctor) && (
                         <Button
                             variant="primary"
                             size="sm"
@@ -379,81 +385,85 @@ export const AppointmentDetailsPage = () => {
                     <AppointmentReasonCard reason={appointment.reason} />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button
-                            onClick={handleOpenVitalSigns}
-                            disabled={isFetchingVitalSigns || appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED'}
-                            className={`rounded-2xl p-6 border transition-all text-left w-full group ${vitalSigns
-                                ? 'bg-emerald-50/50 border-emerald-100 hover:bg-white hover:border-emerald-200 hover:shadow-md'
-                                : 'bg-blue-50/50 border-blue-100 hover:bg-white hover:border-blue-200 hover:shadow-md'
-                                } ${appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED' ? 'cursor-default opacity-90' : ''}`}
-                        >
-                            <div className={`p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform bg-white ${vitalSigns ? 'text-emerald-600' : 'text-blue-600'
-                                }`}>
-                                <Activity size={20} />
-                            </div>
-                            <div className="mt-4">
-                                <h4 className={`font-bold ${vitalSigns ? 'text-emerald-900' : 'text-blue-900'}`}>
-                                    Signos Vitales
-                                </h4>
-                                {vitalSigns ? (
-                                    <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
-                                        <p className="text-emerald-700 text-xs font-medium">TA: <span className="text-emerald-900 font-bold">{vitalSigns.bloodPressure}</span></p>
-                                        <p className="text-emerald-700 text-xs font-medium">Temp: <span className="text-emerald-900 font-bold">{vitalSigns.temperature}°C</span></p>
-                                        <p className="text-emerald-700 text-xs font-medium">FC: <span className="text-emerald-900 font-bold">{vitalSigns.heartRate} bpm</span></p>
-                                        <p className="text-emerald-700 text-xs font-medium">IMC: <span className="text-emerald-900 font-bold">{vitalSigns.bmi}</span></p>
-                                    </div>
-                                ) : (
-                                    <p className="text-blue-700 text-xs mt-1">
-                                        Registra los datos vitales necesarios antes de la consulta.
-                                    </p>
-                                )}
-                                {(appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED') && (
-                                    <span className={`inline-block mt-3 text-xs font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform ${vitalSigns ? 'text-emerald-600' : 'text-blue-600'
-                                        }`}>
-                                        {vitalSigns ? 'Actualizar →' : 'Completar ahora →'}
-                                    </span>
-                                )}
-                            </div>
-                        </button>
+                        {(isAdmin || isNurse) && (
+                            <button
+                                onClick={handleOpenVitalSigns}
+                                disabled={isFetchingVitalSigns || appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED'}
+                                className={`rounded-2xl p-6 border transition-all text-left w-full group ${vitalSigns
+                                    ? 'bg-emerald-50/50 border-emerald-100 hover:bg-white hover:border-emerald-200 hover:shadow-md'
+                                    : 'bg-blue-50/50 border-blue-100 hover:bg-white hover:border-blue-200 hover:shadow-md'
+                                    } ${appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED' ? 'cursor-default opacity-90' : ''}`}
+                            >
+                                <div className={`p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform bg-white ${vitalSigns ? 'text-emerald-600' : 'text-blue-600'
+                                    }`}>
+                                    <Activity size={20} />
+                                </div>
+                                <div className="mt-4">
+                                    <h4 className={`font-bold ${vitalSigns ? 'text-emerald-900' : 'text-blue-900'}`}>
+                                        Signos Vitales
+                                    </h4>
+                                    {vitalSigns ? (
+                                        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
+                                            <p className="text-emerald-700 text-xs font-medium">TA: <span className="text-emerald-900 font-bold">{vitalSigns.bloodPressure}</span></p>
+                                            <p className="text-emerald-700 text-xs font-medium">Temp: <span className="text-emerald-900 font-bold">{vitalSigns.temperature}°C</span></p>
+                                            <p className="text-emerald-700 text-xs font-medium">FC: <span className="text-emerald-900 font-bold">{vitalSigns.heartRate} bpm</span></p>
+                                            <p className="text-emerald-700 text-xs font-medium">IMC: <span className="text-emerald-900 font-bold">{vitalSigns.bmi}</span></p>
+                                        </div>
+                                    ) : (
+                                        <p className="text-blue-700 text-xs mt-1">
+                                            Registra los datos vitales necesarios antes de la consulta.
+                                        </p>
+                                    )}
+                                    {(appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED') && (
+                                        <span className={`inline-block mt-3 text-xs font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform ${vitalSigns ? 'text-emerald-600' : 'text-blue-600'
+                                            }`}>
+                                            {vitalSigns ? 'Actualizar →' : 'Completar ahora →'}
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        )}
 
-                        <button
-                            onClick={handleOpenMedicalHistory}
-                            disabled={isFetchingHistory || appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED'}
-                            className={`rounded-2xl p-6 border transition-all text-left w-full group ${medicalHistory
-                                ? 'bg-purple-50/50 border-purple-100 hover:bg-white hover:border-purple-200 hover:shadow-md'
-                                : 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-md'
-                                } ${appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED' ? 'cursor-default opacity-90' : ''}`}
-                        >
-                            <div className={`p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform bg-white ${medicalHistory ? 'text-purple-600' : 'text-slate-400'
-                                }`}>
-                                <ClipboardList size={20} />
-                            </div>
-                            <div className="mt-4">
-                                <h4 className={`font-bold ${medicalHistory ? 'text-purple-900' : 'text-slate-900'}`}>
-                                    Historial Médico
-                                </h4>
-                                {medicalHistory ? (
-                                    <div className="mt-2 space-y-1">
-                                        <p className="text-purple-700 text-xs truncate uppercase tracking-tight">
-                                            Alergias: <span className="text-purple-900 font-bold">{medicalHistory.allergies || 'Ninguna'}</span>
+                        {(isAdmin || isDoctor) && (
+                            <button
+                                onClick={handleOpenMedicalHistory}
+                                disabled={isFetchingHistory || appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED'}
+                                className={`rounded-2xl p-6 border transition-all text-left w-full group ${medicalHistory
+                                    ? 'bg-purple-50/50 border-purple-100 hover:bg-white hover:border-purple-200 hover:shadow-md'
+                                    : 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-md'
+                                    } ${appointment.status === 'COMPLETED' || appointment.status === 'CANCELLED' ? 'cursor-default opacity-90' : ''}`}
+                            >
+                                <div className={`p-2 rounded-lg shadow-sm group-hover:scale-110 transition-transform bg-white ${medicalHistory ? 'text-purple-600' : 'text-slate-400'
+                                    }`}>
+                                    <ClipboardList size={20} />
+                                </div>
+                                <div className="mt-4">
+                                    <h4 className={`font-bold ${medicalHistory ? 'text-purple-900' : 'text-slate-900'}`}>
+                                        Historial Médico
+                                    </h4>
+                                    {medicalHistory ? (
+                                        <div className="mt-2 space-y-1">
+                                            <p className="text-purple-700 text-xs truncate uppercase tracking-tight">
+                                                Alergias: <span className="text-purple-900 font-bold">{medicalHistory.allergies || 'Ninguna'}</span>
+                                            </p>
+                                            <p className="text-purple-700 text-xs truncate uppercase tracking-tight">
+                                                Crónicas: <span className="text-purple-900 font-bold">{medicalHistory.chronicConditions || 'Ninguna'}</span>
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <p className="text-slate-500 text-xs mt-1">
+                                            No hay historial clínico registrado para este paciente.
                                         </p>
-                                        <p className="text-purple-700 text-xs truncate uppercase tracking-tight">
-                                            Crónicas: <span className="text-purple-900 font-bold">{medicalHistory.chronicConditions || 'Ninguna'}</span>
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <p className="text-slate-500 text-xs mt-1">
-                                        No hay historial clínico registrado para este paciente.
-                                    </p>
-                                )}
-                                {(appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED') && (
-                                    <span className={`inline-block mt-3 text-xs font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform ${medicalHistory ? 'text-purple-600' : 'text-slate-400'
-                                        }`}>
-                                        {medicalHistory ? 'Revisar Detalle →' : 'Ingresar ahora →'}
-                                    </span>
-                                )}
-                            </div>
-                        </button>
+                                    )}
+                                    {(appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED') && (
+                                        <span className={`inline-block mt-3 text-xs font-bold uppercase tracking-wider group-hover:translate-x-1 transition-transform ${medicalHistory ? 'text-purple-600' : 'text-slate-400'
+                                            }`}>
+                                            {medicalHistory ? 'Revisar Detalle →' : 'Ingresar ahora →'}
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        )}
                     </div>
 
                     {appointment.status === 'COMPLETED' && (

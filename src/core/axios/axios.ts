@@ -5,7 +5,8 @@ import type { TResult } from "../types/TResult";
 import store from "../store/store";
 
 const axiosInstance = axios.create({
-    baseURL: "https://medapp-demo-api-production.up.railway.app/api/v1",
+    // baseURL: "https://medapp-demo-api-production.up.railway.app/api/v1",
+    baseURL: "http://localhost:4444/api/v1",
     timeout: 30000,
 });
 

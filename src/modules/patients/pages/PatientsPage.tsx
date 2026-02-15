@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { showToast } from "../../../core/store/toast/toast.slice";
 import { Plus } from "lucide-react";
 import { PatientsForm } from "../components/PatientsForm";
+import { useRole } from "../../../core/hooks/useRole";
 
 
 export const PatientsPage = () => {
@@ -123,15 +124,17 @@ export const PatientsPage = () => {
         getPatients();
     }, []);
 
+    const { isAdmin, isNurse } = useRole();
+
     return (
         <div className="min-h-screen bg-slate-50/50 pt-4 p-8">
             <div className="max-w-14xl mx-auto space-y-8">
                 <PageHeader
                     title="Pacientes"
                     description="Gestiona y visualiza la información de tus pacientes."
-                    buttonLabel="Nuevo Paciente"
-                    onButtonClick={handleCloseModal}
-                    buttonIcon={<Plus size={20} />}
+                    buttonLabel={(isAdmin || isNurse) ? "Nuevo Paciente" : undefined}
+                    onButtonClick={(isAdmin || isNurse) ? handleCloseModal : undefined}
+                    buttonIcon={(isAdmin || isNurse) ? <Plus size={20} /> : undefined}
                 />
 
                 <Modal

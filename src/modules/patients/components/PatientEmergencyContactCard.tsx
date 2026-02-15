@@ -1,6 +1,7 @@
 import { Ambulance, Phone, Mail, Plus, Pencil, MapPin } from 'lucide-react';
 import { Card, Button } from '../../../shared/components';
 import type { EmergencyContact } from '../types/Patients.types';
+import { useRole } from "../../../core/hooks/useRole";
 
 interface PatientEmergencyContactCardProps {
     emergencyContact?: EmergencyContact;
@@ -8,6 +9,7 @@ interface PatientEmergencyContactCardProps {
 }
 
 export const PatientEmergencyContactCard = ({ emergencyContact, onEdit }: PatientEmergencyContactCardProps) => {
+    const { isAdmin, isNurse } = useRole();
     return (
         <Card
             title={
@@ -16,7 +18,7 @@ export const PatientEmergencyContactCard = ({ emergencyContact, onEdit }: Patien
                         <Ambulance size={20} className="text-red-500" />
                         <span>Contacto de Emergencia</span>
                     </div>
-                    {emergencyContact && (
+                    {(emergencyContact && (isAdmin || isNurse)) && (
                         <Button
                             variant="ghost"
                             size="xs"
@@ -55,14 +57,16 @@ export const PatientEmergencyContactCard = ({ emergencyContact, onEdit }: Patien
                         <Plus size={24} className="text-red-400" />
                     </div>
                     <p className="text-sm text-slate-500">¿No tienes un contacto de emergencia registrado?</p>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                        onClick={onEdit}
-                    >
-                        Agregar Contacto
-                    </Button>
+                    {(isAdmin || isNurse) && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                            onClick={onEdit}
+                        >
+                            Agregar Contacto
+                        </Button>
+                    )}
                 </div>
             )}
         </Card>

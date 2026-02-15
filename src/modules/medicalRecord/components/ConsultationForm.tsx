@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useRole } from '../../../core/hooks/useRole';
 import { Button, Input } from '../../../shared/components';
 import {
     ClipboardList,
@@ -56,6 +57,7 @@ const SECTIONS = [
 
 export const ConsultationForm = ({ patientId, doctorId, appointmentId, onSubmit, isLoading }: ConsultationFormProps) => {
     const [activeSection, setActiveSection] = useState(0);
+    const { isAdmin, isDoctor } = useRole();
 
     const formik = useFormik({
         initialValues: {
@@ -107,8 +109,8 @@ export const ConsultationForm = ({ patientId, doctorId, appointmentId, onSubmit,
                         onClick={() => index < activeSection || formik.isValid ? setActiveSection(index) : null}
                     >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${index <= activeSection
-                                ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200'
-                                : 'bg-white border-slate-200 text-slate-400'
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200'
+                            : 'bg-white border-slate-200 text-slate-400'
                             }`}>
                             {index < activeSection ? <CheckCircle2 size={20} /> : section.icon}
                         </div>
@@ -235,15 +237,17 @@ export const ConsultationForm = ({ patientId, doctorId, appointmentId, onSubmit,
                             Siguiente
                         </Button>
                     ) : (
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            isLoading={isLoading}
-                            className="px-10 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200"
-                            leftIcon={<CheckCircle2 size={18} />}
-                        >
-                            Finalizar Consulta
-                        </Button>
+                        (isAdmin || isDoctor) && (
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                isLoading={isLoading}
+                                className="px-10 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200"
+                                leftIcon={<CheckCircle2 size={18} />}
+                            >
+                                Finalizar Consulta
+                            </Button>
+                        )
                     )}
                 </div>
             </form>

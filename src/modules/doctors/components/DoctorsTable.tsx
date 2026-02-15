@@ -2,6 +2,7 @@ import { Button, Table, type Column } from "../../../shared/components"
 import { User, Phone, Mail, Award, Trash2, Eye } from 'lucide-react'
 import type { Doctor } from "../types/DoctorsTypes";
 import { useNavigate } from "react-router-dom";
+import { useRole } from "../../../core/hooks/useRole";
 
 interface DoctorsTableProps {
     data: Doctor[];
@@ -12,6 +13,7 @@ interface DoctorsTableProps {
 export const DoctorsTable = ({ data, isLoading, onDelete }: DoctorsTableProps) => {
 
     const navigate = useNavigate();
+    const { isAdmin } = useRole();
 
     const columns: Column<Doctor>[] = [
         {
@@ -95,16 +97,18 @@ export const DoctorsTable = ({ data, isLoading, onDelete }: DoctorsTableProps) =
                     >
                         <Eye size={18} />
                     </Button>
-                    <Button
-                        variant="ghost"
-                        size="xs"
-                        rounded="lg"
-                        className="text-red-500 hover:bg-red-50"
-                        onClick={() => onDelete?.(row)}
-                        title="Eliminar"
-                    >
-                        <Trash2 size={18} />
-                    </Button>
+                    {isAdmin && (
+                        <Button
+                            variant="ghost"
+                            size="xs"
+                            rounded="lg"
+                            className="text-red-500 hover:bg-red-50"
+                            onClick={() => onDelete?.(row)}
+                            title="Eliminar"
+                        >
+                            <Trash2 size={18} />
+                        </Button>
+                    )}
                 </div>
             )
         }

@@ -7,6 +7,7 @@ import { showToast } from "../../../core/store/toast/toast.slice";
 import { getDoctorById, updateDoctor } from "../services/DoctorsService";
 import type { Doctor, DoctorDto } from "../types/DoctorsTypes";
 import { DoctorsForm } from "../components/DoctorsForm";
+import { useRole } from "../../../core/hooks/useRole";
 
 // Modular Components
 import { DoctorProfileCard } from "../components/DoctorProfileCard";
@@ -17,6 +18,7 @@ export const DoctorDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { isAdmin } = useRole();
 
     const [doctor, setDoctor] = useState<Doctor | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -129,11 +131,13 @@ export const DoctorDetailsPage = () => {
                     </div>
                 </div>
 
-                <div className="flex gap-3">
-                    <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(true)}>
-                        Editar Información
-                    </Button>
-                </div>
+                {isAdmin && (
+                    <div className="flex gap-3">
+                        <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(true)}>
+                            Editar Información
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

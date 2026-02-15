@@ -10,11 +10,13 @@ import {
     Package
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useRole } from '../../../core/hooks/useRole';
 
 
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const { isAdmin, isDoctor } = useRole();
 
     const homeMenuItems = [
         {
@@ -45,12 +47,12 @@ const HomePage = () => {
             onClick: () => navigate('/nurses'),
             isAvailable: true
         },
-        {
+        ...((isAdmin || isDoctor) ? [{
             title: 'Historial',
             icon: ClipboardList,
             color: 'orange' as const,
             isAvailable: false
-        },
+        }] : []),
         {
             title: 'Laboratorio',
             icon: Activity,

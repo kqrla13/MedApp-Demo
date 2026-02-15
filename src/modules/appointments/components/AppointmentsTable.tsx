@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useRole } from "../../../core/hooks/useRole";
 import { useEffect, useState } from "react";
 import type { Appointment, AppointmentStatus } from "../types/Appointments.types";
 import { Table, type Column, Button } from "../../../shared/components";
@@ -15,6 +16,7 @@ interface AppointmentTableProps {
 
 export const AppointmentsTable = ({ data, isLoading, onDelete }: AppointmentTableProps) => {
     const navigate = useNavigate();
+    const { isAdmin, isNurse, isDoctor, doctorId } = useRole();
     const [doctors, setDoctors] = useState<CatalogItem[]>([]);
 
     useEffect(() => {
@@ -129,16 +131,18 @@ export const AppointmentsTable = ({ data, isLoading, onDelete }: AppointmentTabl
                     >
                         <Eye size={18} />
                     </Button>
-                    <Button
-                        variant="ghost"
-                        size="xs"
-                        rounded="lg"
-                        className="text-red-500 hover:bg-red-50"
-                        onClick={() => onDelete?.(row)}
-                        title="Eliminar"
-                    >
-                        <Trash2 size={18} />
-                    </Button>
+                    {((isAdmin || isNurse) || (isDoctor && row.doctorId === doctorId)) && (
+                        <Button
+                            variant="ghost"
+                            size="xs"
+                            rounded="lg"
+                            className="text-red-500 hover:bg-red-50"
+                            onClick={() => onDelete?.(row)}
+                            title="Eliminar"
+                        >
+                            <Trash2 size={18} />
+                        </Button>
+                    )}
                 </div>
             )
         }

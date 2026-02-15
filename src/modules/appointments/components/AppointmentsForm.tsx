@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { GetAllPatients } from '../../patients/services/PatientsService';
 import { getDoctors, getSpecialties } from '../../../core/services/CatalogService';
 import type { CatalogItem } from '../../../core/types/Catalog';
+import { useRole } from '../../../core/hooks/useRole';
 
 interface AppointmentsFormProps {
     onSubmit: (values: AppointmentDto) => void;
@@ -67,6 +68,7 @@ export const AppointmentsForm = ({ onSubmit, initialValues, isLoading, onClose }
     const [patients, setPatients] = useState<Patient[]>([]);
     const [specialties, setSpecialties] = useState<CatalogItem[]>([]);
     const [doctors, setDoctors] = useState<CatalogItem[]>([]);
+    const { isDoctor, doctorId } = useRole();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -103,8 +105,12 @@ export const AppointmentsForm = ({ onSubmit, initialValues, isLoading, onClose }
                 ...initialValues,
                 date: initialValues.date?.split('T')[0] || '',
                 time: formatTimeTo24h(initialValues.time),
+                doctorId: String(initialValues.doctorId)
             }
-            : defaultValues,
+            : {
+                ...defaultValues,
+                doctorId: isDoctor ? String(doctorId) : ''
+            },
         enableReinitialize: true,
         validationSchema,
         onSubmit: (values) => {
@@ -210,6 +216,7 @@ export const AppointmentsForm = ({ onSubmit, initialValues, isLoading, onClose }
                     error={formik.errors.doctorId as string}
                     leftIcon={<User size={18} />}
                     required
+                    disabled={isDoctor}
                     options={doctors.map(d => ({
                         value: d.id,
                         label: d.name

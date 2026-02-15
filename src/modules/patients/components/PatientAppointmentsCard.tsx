@@ -4,6 +4,7 @@ import type { Appointment } from '../../appointments/types/Appointments.types';
 import { useDispatch } from 'react-redux';
 import { showToast } from '../../../core/store/toast/toast.slice';
 import { useNavigate } from 'react-router-dom';
+import { useRole } from '../../../core/hooks/useRole';
 
 interface PatientAppointmentsCardProps {
     appointments?: Appointment[];
@@ -20,6 +21,7 @@ export const PatientAppointmentsCard = ({
 }: PatientAppointmentsCardProps) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { isAdmin, isDoctor } = useRole();
 
     const handleMedicalRecordClick = (e: React.MouseEvent, apt: Appointment) => {
         e.stopPropagation();
@@ -107,15 +109,17 @@ export const PatientAppointmentsCard = ({
                                         variant="ghost"
                                         size="sm"
                                     />
-                                    <Button
-                                        variant="outline"
-                                        size="xs"
-                                        onClick={(e) => handleMedicalRecordClick(e, apt)}
-                                        className="h-8 text-[11px] font-bold uppercase tracking-wider gap-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
-                                    >
-                                        <FileText size={14} />
-                                        Registro Médico
-                                    </Button>
+                                    {(isAdmin || isDoctor) && (
+                                        <Button
+                                            variant="outline"
+                                            size="xs"
+                                            onClick={(e) => handleMedicalRecordClick(e, apt)}
+                                            className="h-8 text-[11px] font-bold uppercase tracking-wider gap-1.5 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                                        >
+                                            <FileText size={14} />
+                                            Registro Médico
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         );
